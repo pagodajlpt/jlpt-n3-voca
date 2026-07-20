@@ -1,5 +1,8 @@
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#FFFFFF" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#141C2C" media="(prefers-color-scheme: dark)">
+<meta name="apple-mobile-web-app-capable" content="yes">
 <title>파고다 JLPT N3 VOCA · 단어 인덱스</title>
 <style>
 :root{
@@ -43,9 +46,13 @@ body{
   margin:0; background:var(--ground); color:var(--text);
   font-family:"Pretendard","Pretendard Variable",-apple-system,BlinkMacSystemFont,"Malgun Gothic","맑은 고딕",system-ui,sans-serif;
   font-size:15px; line-height:1.5; -webkit-text-size-adjust:100%;
+  -webkit-tap-highlight-color:transparent; overscroll-behavior-y:none;
 }
+button{touch-action:manipulation}
 .jp{font-family:"Pretendard JP","Yu Gothic","Hiragino Kaku Gothic ProN","Meiryo","Noto Sans JP",sans-serif;}
-.wrap{max-width:940px;margin:0 auto;padding:0 16px}
+.wrap{max-width:940px;margin:0 auto;
+  padding-left:max(16px, env(safe-area-inset-left));
+  padding-right:max(16px, env(safe-area-inset-right))}
 
 /* ── 헤더 ── */
 header{background:var(--surface);border-bottom:1px solid var(--line)}
@@ -66,7 +73,7 @@ header{background:var(--surface);border-bottom:1px solid var(--line)}
   border:1.5px solid var(--line);border-radius:10px;padding:0 12px;transition:border-color .15s}
 .search:focus-within{border-color:var(--focus)}
 .search svg{flex:none;color:var(--faint)}
-.search input{flex:1;border:0;background:none;color:var(--text);font:inherit;font-size:15px;padding:11px 0;outline:none}
+.search input{flex:1;border:0;background:none;color:var(--text);font:inherit;font-size:16px;padding:11px 0;outline:none}
 .search button{border:0;background:none;color:var(--faint);cursor:pointer;font-size:16px;padding:4px 2px;line-height:1}
 .search button:hover{color:var(--text)}
 
@@ -90,8 +97,8 @@ header{background:var(--surface);border-bottom:1px solid var(--line)}
 .dayb.v[aria-pressed="true"]{background:var(--vocab);border-color:var(--vocab)}
 .dayb:hover{border-color:var(--faint)}
 
-.status{display:flex;gap:14px;align-items:center;padding:0 0 12px;font-size:12.5px;color:var(--muted);
-  font-variant-numeric:tabular-nums}
+.status{display:flex;gap:14px;align-items:center;flex-wrap:wrap;padding:0 0 12px;font-size:12.5px;
+  color:var(--muted);font-variant-numeric:tabular-nums}
 .status b{color:var(--text);font-weight:700}
 .bar{flex:1;height:5px;background:var(--line-soft);border-radius:99px;overflow:hidden;max-width:220px}
 .bar i{display:block;height:100%;background:var(--known);width:0;transition:width .3s}
@@ -99,8 +106,10 @@ header{background:var(--surface);border-bottom:1px solid var(--line)}
 
 /* ── 목록 ── */
 main{padding:18px 0 80px}
-.group{margin-bottom:26px}
-.ghead{display:flex;align-items:center;gap:10px;margin:0 0 10px;padding-bottom:8px;border-bottom:2px solid var(--line)}
+/* 화면 밖 DAY 묶음은 렌더를 건너뛴다(--n = 그 DAY의 단어 수) */
+.group{margin-bottom:26px;content-visibility:auto;contain-intrinsic-size:0 calc(var(--n,20) * 52px + 70px)}
+.ghead{display:flex;align-items:center;gap:10px;margin:0 0 10px;padding:6px 0 8px;
+  border-bottom:2px solid var(--line);position:sticky;top:var(--tb,0px);background:var(--ground);z-index:20}
 .gnum{font-size:12px;font-weight:800;color:#fff;background:var(--kanji);border-radius:6px;padding:3px 8px;
   font-variant-numeric:tabular-nums;letter-spacing:.02em}
 .gnum.v{background:var(--vocab)}
@@ -111,13 +120,14 @@ ul{list-style:none;margin:0;padding:0;display:grid;gap:6px}
 li.row{background:var(--surface);border:1px solid var(--line);border-radius:10px;
   display:grid;grid-template-columns:24px minmax(0,7.5rem) minmax(0,6.5rem) minmax(0,1fr) 3.2rem;
   gap:14px;align-items:center;
-  padding:11px 13px;cursor:pointer;transition:border-color .12s,background .12s;
-  content-visibility:auto;contain-intrinsic-size:0 46px}
+  padding:11px 13px;cursor:pointer;transition:border-color .12s,background .12s}
 li.row:hover{border-color:var(--faint)}
 li.row.known{background:var(--known-bg);border-color:transparent}
 li.row.open{border-color:var(--focus)}
 .chk{width:22px;height:22px;border-radius:6px;border:1.5px solid var(--line);background:var(--surface-2);
-  display:grid;place-items:center;cursor:pointer;padding:0;color:transparent;font-size:13px;line-height:1}
+  display:grid;place-items:center;cursor:pointer;padding:0;color:transparent;font-size:13px;line-height:1;
+  position:relative}
+.chk::after{content:"";position:absolute;top:-12px;left:-13px;right:-13px;bottom:-12px}  /* 터치 영역 확대 */
 li.row.known .chk{background:var(--known);border-color:var(--known);color:#fff}
 .chk:focus-visible{outline:2px solid var(--focus);outline-offset:2px}
 .w{font-size:19px;font-weight:600;color:var(--text);word-break:break-word;line-height:1.35}
@@ -126,9 +136,13 @@ li.row.known .chk{background:var(--known);border-color:var(--known);color:#fff}
 .m{font-size:14.5px;color:var(--text);word-break:break-word;
   border-left:1px solid var(--line-soft);padding-left:14px;margin-left:-14px}
 .st{font-size:11px;color:var(--star);letter-spacing:-1px;white-space:nowrap;text-align:right}
-.hide-m .m,.hide-w .w,.hide-r .rd{filter:blur(6px);opacity:.5;transition:filter .12s,opacity .12s}
+.hide-m .m,.hide-w .w,.hide-r .rd{filter:blur(6px);opacity:.5;transition:filter .12s,opacity .12s;
+  cursor:pointer;-webkit-user-select:none;user-select:none}
 .hide-m li.row.open .m,.hide-w li.row.open .w,.hide-r li.row.open .rd,
-.hide-m .m:hover,.hide-w .w:hover,.hide-r .rd:hover{filter:none;opacity:1}
+.m.peek,.w.peek,.rd.peek{filter:none;opacity:1}
+@media (hover:hover){  /* 마우스 환경에서만 hover로 살짝 보기 */
+  .hide-m .m:hover,.hide-w .w:hover,.hide-r .rd:hover{filter:none;opacity:1}
+}
 .ex{grid-column:1/-1;border-top:1px dashed var(--line);margin-top:2px;padding-top:9px;display:none}
 li.row.open .ex{display:block}
 .exj{font-size:15.5px;color:var(--text);margin-bottom:3px}
@@ -144,11 +158,43 @@ li.row.open .ex{display:block}
 footer{border-top:1px solid var(--line);color:var(--faint);font-size:12px;padding:16px 0 30px;text-align:center}
 
 @media (max-width:720px){
-  li.row{grid-template-columns:24px minmax(0,1fr) 3rem;row-gap:2px;gap:10px}
-  .w{font-size:18px;grid-column:2}
-  .rd{grid-column:2;border-left:0;padding-left:0;margin-left:0;font-size:12.5px}
-  .m{grid-column:2/4;border-left:0;padding-left:0;margin-left:0;font-size:14px;color:var(--muted)}
-  .st{grid-row:1;grid-column:3}
+  /* 2줄 구성: [✓] 단어 요미가나 ★ / 뜻 — 한 화면에 더 많이 보이도록 */
+  li.row{display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 9px;padding:10px 12px}
+  /* 순서 고정: 첫 줄 [✓ 단어 요미가나 ★] → 둘째 줄 [뜻] */
+  .chk{order:0;align-self:center}
+  .w{order:1;font-size:18px;flex:0 1 auto;min-width:0}
+  .rd{order:2;flex:1 1 auto;min-width:0;font-size:12.5px;border-left:0;padding-left:0;margin-left:0}
+  .st{order:3;margin-left:auto;flex:none}
+  .m{order:4;flex:0 0 auto;width:calc(100% - 33px);margin-left:33px;border-left:0;padding-left:0;
+     font-size:14px;color:var(--muted)}
+  .ex{order:5;flex:0 0 auto;width:calc(100% - 33px);margin-left:33px}
+  .status{gap:10px 14px}
+  /* 툴바를 납작하게 — 폰에서는 목록이 보일 공간이 중요 */
+  .head{padding:14px 0 10px}
+  .brand{font-size:17px}
+  .searchrow{padding:9px 0 8px}
+  .search input{padding:9px 0}
+  .chips{flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;padding-bottom:8px;
+    -webkit-overflow-scrolling:touch}
+  .chips::-webkit-scrollbar{display:none}
+  .chip{flex:none;padding:7px 13px}
+  .days{gap:6px;padding-bottom:9px;scroll-snap-type:x proximity;-webkit-overflow-scrolling:touch;
+    scrollbar-width:none}
+  .days::-webkit-scrollbar{display:none}
+  .dayb{scroll-snap-align:center;min-width:42px;padding:8px 9px}
+  .status{padding-bottom:9px;font-size:12px}
+  .group{contain-intrinsic-size:0 calc(var(--n,20) * 77px + 70px)}
+  .bar{max-width:110px}
+  main{padding:14px 0 90px}
+  .group{margin-bottom:20px}
+  .gtitle{font-size:14px}
+  .gcount{display:none}
+  .top{right:14px;bottom:calc(14px + env(safe-area-inset-bottom));width:46px;height:46px}
+  footer{padding-bottom:calc(30px + env(safe-area-inset-bottom))}
+}
+@media (max-width:380px){
+  .rd{font-size:12px}
+  .w{font-size:17px}
 }
 </style>
 
@@ -312,7 +358,7 @@ function render(){
       if(curDay!==null) html.push('</ul></section>');
       curDay=w.d;
       var cnt = rows.filter(function(x){ return x.d===curDay; }).length;
-      html.push('<section class="group"><div class="ghead">'+
+      html.push('<section class="group" style="--n:'+cnt+'"><div class="ghead">'+
         '<span class="gnum'+(w.d>7?' v':'')+'">DAY '+(w.d<10?'0':'')+w.d+'</span>'+
         '<span class="gtitle">'+esc(LESSONS[w.d]||'')+'</span>'+
         '<span class="gcount">'+cnt+'단어</span></div><ul>');
@@ -336,6 +382,16 @@ function render(){
 el.list.addEventListener('click', function(e){
   var row = e.target.closest('.row'); if(!row) return;
   var id = row.dataset.id;
+  /* 가려진 칸을 탭하면 그 칸만 살짝 보기 (터치 기기에서 hover 대체) */
+  var cell = e.target.closest('.m,.w,.rd');
+  if(cell && !e.target.closest('.chk')){
+    var cls = cell.classList.contains('m') ? 'hide-m'
+            : cell.classList.contains('w') ? 'hide-w' : 'hide-r';
+    if(el.list.classList.contains(cls) && !row.classList.contains('open')){
+      cell.classList.toggle('peek');
+      return;
+    }
+  }
   if(e.target.closest('.chk')){
     known[id] = !known[id];
     if(!known[id]) delete known[id];
@@ -365,6 +421,12 @@ tb.addEventListener('click', function(){
 
 /* 스크롤 UI */
 var tbar=document.getElementById('toolbar'), topb=document.getElementById('top');
+function syncTb(){   /* DAY 헤더가 툴바 바로 아래에 붙도록 높이 전달 */
+  document.documentElement.style.setProperty('--tb', tbar.offsetHeight+'px');
+}
+syncTb();
+addEventListener('resize', syncTb);
+addEventListener('orientationchange', function(){ setTimeout(syncTb, 250); });
 addEventListener('scroll', function(){
   tbar.classList.toggle('stuck', tbar.getBoundingClientRect().top<=0);
   topb.classList.toggle('show', scrollY>600);
